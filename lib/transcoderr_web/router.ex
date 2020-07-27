@@ -24,6 +24,13 @@ defmodule TranscoderrWeb.Router do
     live "/libraries/:id", LibraryLive.Show, :show
     live "/libraries/:id/show/edit", LibraryLive.Show, :edit
 
+    live "/media", MediumLive.Index, :index
+    live "/media/new", MediumLive.Index, :new
+    live "/media/:id/edit", MediumLive.Index, :edit
+
+    live "/media/:id", MediumLive.Show, :show
+    live "/media/:id/show/edit", MediumLive.Show, :edit
+
     live "/", PageLive, :index
   end
 
