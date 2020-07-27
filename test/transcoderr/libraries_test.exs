@@ -37,6 +37,10 @@ defmodule Transcoderr.LibrariesTest do
       assert library.path == @priv_path
     end
 
+    test "create_library/1 with invalid path returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Libraries.create_library(%{path: "/nonexistent"})
+    end
+
     test "create_library/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Libraries.create_library(@invalid_attrs)
     end
