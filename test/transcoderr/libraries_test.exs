@@ -6,8 +6,10 @@ defmodule Transcoderr.LibrariesTest do
   describe "libraries" do
     alias Transcoderr.Libraries.Library
 
-    @valid_attrs %{name: "some name", path: "some path"}
-    @update_attrs %{name: "some updated name", path: "some updated path"}
+    @priv_path to_string(:code.priv_dir(:transcoderr))
+    @repo_path Path.join(@priv_path, "repo")
+    @valid_attrs %{name: "some name", path: @priv_path}
+    @update_attrs %{name: "some updated name", path: @repo_path}
     @invalid_attrs %{name: nil, path: nil}
 
     def library_fixture(attrs \\ %{}) do
@@ -32,7 +34,7 @@ defmodule Transcoderr.LibrariesTest do
     test "create_library/1 with valid data creates a library" do
       assert {:ok, %Library{} = library} = Libraries.create_library(@valid_attrs)
       assert library.name == "some name"
-      assert library.path == "some path"
+      assert library.path == @priv_path
     end
 
     test "create_library/1 with invalid data returns error changeset" do
@@ -43,7 +45,7 @@ defmodule Transcoderr.LibrariesTest do
       library = library_fixture()
       assert {:ok, %Library{} = library} = Libraries.update_library(library, @update_attrs)
       assert library.name == "some updated name"
-      assert library.path == "some updated path"
+      assert library.path == @repo_path
     end
 
     test "update_library/2 with invalid data returns error changeset" do

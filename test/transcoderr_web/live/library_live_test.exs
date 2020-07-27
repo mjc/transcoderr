@@ -5,8 +5,10 @@ defmodule TranscoderrWeb.LibraryLiveTest do
 
   alias Transcoderr.Libraries
 
-  @create_attrs %{name: "some name", path: "some path"}
-  @update_attrs %{name: "some updated name", path: "some updated path"}
+  @priv_path to_string(:code.priv_dir(:transcoderr))
+  @repo_path Path.join(@priv_path, "repo")
+  @create_attrs %{name: "some name", path: @priv_path}
+  @update_attrs %{name: "some updated name", path: @repo_path}
   @invalid_attrs %{name: nil, path: nil}
 
   defp fixture(:library) do
