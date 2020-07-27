@@ -11,7 +11,12 @@
   <%= error_tag f, :name %>
 
   <%= label f, :path %>
-  <%= text_input f, :path %>
+  <%= text_input f, :path, autocomplete: "off", list: "directories" %>
+  <datalist id="directories">
+    <%= for path <- @directories do %>
+      <option value="<%= path %>"/>
+    <% end %>
+  </datalist>
   <%= error_tag f, :path %>
 
   <%= submit "Save", phx_disable_with: "Saving..." %>
