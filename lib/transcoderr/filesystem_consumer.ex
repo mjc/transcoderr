@@ -5,6 +5,8 @@ defmodule Transcoderr.FilesystemConsumer do
 
   alias Broadway.Message
 
+  alias Transcoderr.Libraries
+
   def start_link(opts) do
     dirs = opts[:dirs] || ["/nonexistent"]
 
@@ -44,22 +46,29 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   defp handle_fsevent(path, event) when event in [:created, :modified] do
-    medium = Transcoderr.Libraries.get_medium_by_path(path)
+    medium = Libraries.get_medium_by_path(path)
+    attrs = medium_attrs(path)
 
-    case Transcoderr.Libraries.get_medium_by_path(medium_attrs(path)) do
-      {:ok, medium} ->
-        Logger.debug("Created medium #{inspect(medium)}", medium_id: medium.id)
+    case medium do
+      nil ->
+        case Libraries.create_medium(attrs) do
+          {:ok, medium} ->
+            Logger.debug("Created medium #{inspect(medium)}", medium_id: medium.id)
 
-      {:error, medium} ->
-        Logger.debug("Could not create medium for path #{inspect(path)} (#{inspect(medium)})",
-          path: path,
-          medium: medium
-        )
+          {:error, medium} ->
+            Logger.debug("Could not create medium for path #{inspect(path)} (#{inspect(medium)})",
+              path: path,
+              medium: medium
+            )
+        end
+
+      medium ->
+        Libraries.update_medium(medium, attrs)
     end
   end
 
   defp handle_fsevent(path, event) when event in [:deleted] do
-    case Transcoderr.Libraries.delete_media_by_path(path) do
+    case Libraries.delete_media_by_path(path) do
       {count, _} when count > 0 ->
         Logger.debug("Deleted media for #{inspect(path)}", path: path)
 
@@ -74,13 +83,19 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   defp medium_attrs(path) do
-    %{
-      name: Path.basename(path),
-      path: path,
-      extension: Path.extname(path),
-      video_codec: "hardcoded",
-      library_id: Transcoderr.Libraries.get_library_by_path(path).id
-    }
+    case Libraries.get_library_by_path(path) do
+      nil ->
+        raise ArgumentError, "No library found for #{inspect(path)}"
+
+      library ->
+        %{
+          name: Path.basename(path),
+          path: path,
+          extension: Path.extname(path),
+          video_codec: "hardcoded",
+          library_id: Map.get(library, :id)
+        }
+    end
   end
 
   @spec transform(any, any) :: Broadway.Message.t()
