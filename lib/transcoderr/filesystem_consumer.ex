@@ -39,7 +39,7 @@ defmodule Transcoderr.FilesystemConsumer do
   def handle_message(:default, %Message{data: {path, event}} = message, _context) do
     handle_fsevent(path, event)
 
-    message |> IO.inspect()
+    message
   end
 
   defp handle_fsevent(path, event) when event in [:created, :modified] do
@@ -63,7 +63,7 @@ defmodule Transcoderr.FilesystemConsumer do
       path: path,
       extension: Path.extname(path),
       video_codec: "hardcoded",
-      library: Transcoderr.Libraries.get_library_by_path(path)
+      library_id: Transcoderr.Libraries.get_library_by_path(path).id
     }
   end
 
