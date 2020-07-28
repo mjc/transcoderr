@@ -26,10 +26,12 @@ defmodule Transcoderr.FilesystemConsumer do
     )
   end
 
+  @spec start(any) :: :ignore | {:error, any} | {:ok, pid} | {:ok, pid, any}
   def start(opts) do
     DynamicSupervisor.start_child(Transcoderr.FilesystemSupervisor, {__MODULE__, opts})
   end
 
+  @spec stop :: :not_found | :ok | {:error, :not_found}
   def stop() do
     case Process.whereis(Transcoderr.FilesystemConsumer) do
       nil ->

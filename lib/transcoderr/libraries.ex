@@ -260,6 +260,7 @@ defmodule Transcoderr.Libraries do
 
   @spec restart_monitoring :: :error | :ok
   def restart_monitoring() do
+    # @TODO this dumps the mailbox. it should not
     stop_monitoring()
     start_monitoring()
   end
