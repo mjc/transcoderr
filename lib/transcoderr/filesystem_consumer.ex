@@ -36,6 +36,7 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   @impl true
+  @spec handle_message(:default, Broadway.Message.t(), any) :: Broadway.Message.t()
   def handle_message(:default, %Message{data: {path, event}} = message, _context) do
     handle_fsevent(path, event)
 
