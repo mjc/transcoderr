@@ -31,10 +31,16 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   def stop() do
-    DynamicSupervisor.terminate_child(
-      Transcoderr.FilesystemSupervisor,
-      Process.whereis(Transcoderr.FilesystemConsumer)
-    )
+    case Process.whereis(Transcoderr.FilesystemConsumer) do
+      nil ->
+        :not_found
+
+      pid ->
+        DynamicSupervisor.terminate_child(
+          Transcoderr.FilesystemSupervisor,
+          pid
+        )
+    end
   end
 
   @impl true

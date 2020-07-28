@@ -239,6 +239,7 @@ defmodule Transcoderr.Libraries do
     end
   end
 
+  @spec start_monitoring :: :error | :ok
   def start_monitoring() do
     dirs =
       Repo.all(
@@ -246,10 +247,20 @@ defmodule Transcoderr.Libraries do
           select: l.path
       )
 
-    Transcoderr.FilesystemConsumer.start(dirs: dirs)
+    case Transcoderr.FilesystemConsumer.start(dirs: dirs) do
+      {:ok, _pid} -> :ok
+      _ -> :error
+    end
   end
 
+  @spec stop_monitoring :: :ok | {:error, :not_found}
   def stop_monitoring() do
     Transcoderr.FilesystemConsumer.stop()
+  end
+
+  @spec restart_monitoring :: :error | :ok
+  def restart_monitoring() do
+    stop_monitoring()
+    start_monitoring()
   end
 end
