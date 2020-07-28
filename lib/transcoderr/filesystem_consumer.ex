@@ -67,6 +67,9 @@ defmodule Transcoderr.FilesystemConsumer do
     end
   end
 
+  # @TODO we should debounce these during batching
+  defp handle_fsevent(_path, event) when event in [:modified], do: :skipped
+
   defp handle_fsevent(path, event) do
     IO.inspect(path, label: "path")
     IO.inspect(event, label: "event")
