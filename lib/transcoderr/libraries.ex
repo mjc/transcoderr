@@ -37,6 +37,14 @@ defmodule Transcoderr.Libraries do
   """
   def get_library!(id), do: Repo.get!(Library, id)
 
+  @spec get_library_by_path(String.t()) :: Library.t()
+  def get_library_by_path(path) do
+    Enum.find(
+      Repo.all(Library),
+      fn library -> String.starts_with?(path, library.path) end
+    )
+  end
+
   @doc """
   Creates a library.
 
