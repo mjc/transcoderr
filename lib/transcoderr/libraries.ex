@@ -58,9 +58,19 @@ defmodule Transcoderr.Libraries do
 
   """
   def create_library(attrs \\ %{}) do
-    %Library{}
-    |> Library.changeset(attrs)
-    |> Repo.insert()
+    result =
+      %Library{}
+      |> Library.changeset(attrs)
+      |> Repo.insert()
+
+    case result do
+      {:ok, library} ->
+        restart_monitoring()
+        {:ok, library}
+
+      any ->
+        any
+    end
   end
 
   @doc """
@@ -76,9 +86,19 @@ defmodule Transcoderr.Libraries do
 
   """
   def update_library(%Library{} = library, attrs) do
-    library
-    |> Library.changeset(attrs)
-    |> Repo.update()
+    result =
+      library
+      |> Library.changeset(attrs)
+      |> Repo.update()
+
+    case result do
+      {:ok, library} ->
+        restart_monitoring()
+        {:ok, library}
+
+      any ->
+        any
+    end
   end
 
   @doc """
