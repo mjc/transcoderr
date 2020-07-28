@@ -1,14 +1,17 @@
 defmodule OffBroadway.FilesystemProducer do
   use GenStage
 
-  require Logger
+  def start_link(args) do
+    GenStage.start_link(__MODULE__, args)
+  end
+
   @impl true
   def init(opts) do
-    dir = opts[:dir]
+    dirs = opts[:dirs] || [opts[:dir]]
     # @TODO: this needs to be made more robust
-    name = String.to_atom("#{dir}_monitor")
+    name = __MODULE__.Watcher
 
-    case FileSystem.start_link(dirs: [dir], name: name) do
+    case FileSystem.start_link(dirs: dirs, name: name) do
       {:error, message} ->
         raise ArgumentError, "invalid options given, " <> message
 
@@ -17,7 +20,6 @@ defmodule OffBroadway.FilesystemProducer do
 
         {:producer,
          %{
-           demand: 0,
            watcher_pid: watcher_pid,
            messages: []
          }}
@@ -25,19 +27,9 @@ defmodule OffBroadway.FilesystemProducer do
   end
 
   @impl true
-  def handle_demand(incoming_demand, %{demand: demand} = state) do
-    handle_receive_messages(%{state | demand: demand + incoming_demand})
-  end
-
-  def handle_receive_messages(%{demand: demand, messages: messages} = state) when demand > 0 do
-    {outgoing, saved} = Enum.split(messages, demand)
-    new_demand = demand - length(outgoing)
-
-    {:noreply, outgoing, %{state | demand: new_demand, messages: saved}}
-  end
-
-  def handle_receive_messages(state) do
-    {:noreply, [], state}
+  def handle_demand(demand, %{messages: messages} = state) do
+    {taking, keeping} = Enum.split(messages, demand)
+    {:noreply, taking, %{state | messages: keeping}}
   end
 
   @impl true
@@ -46,10 +38,9 @@ defmodule OffBroadway.FilesystemProducer do
         %{watcher_pid: watcher_pid, messages: current_messages} = state
       ) do
     # YOUR OWN LOGIC FOR PATH AND EVENTS
-    new_messages = Enum.map(events, fn event -> {path, event} end)
+    [message | new_messages] = Enum.map(events, fn event -> {path, event} end)
     messages = current_messages ++ new_messages
-    IO.inspect()
-    {:noreply, %{state | messages: messages}}
+    {:noreply, [message], %{state | messages: messages}}
   end
 
   def handle_info({:file_event, watcher_pid, :stop}, %{watcher_pid: watcher_pid} = state) do
