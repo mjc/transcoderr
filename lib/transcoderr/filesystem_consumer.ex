@@ -53,7 +53,7 @@ defmodule Transcoderr.FilesystemConsumer do
     message
   end
 
-  defp handle_fsevent(path, event) when event in [:created, :modified] do
+  defp handle_fsevent(path, event) when event in [:created] do
     Libraries.create_or_update_medium_by_path!(path)
   end
 
