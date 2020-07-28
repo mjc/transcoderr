@@ -245,7 +245,7 @@ defmodule Transcoderr.Libraries do
             name: Path.basename(path),
             path: path,
             extension: Path.extname(path),
-            video_codec: "hardcoded",
+            video_codec: get_video_codec(path),
             library_id: Map.get(library, :id)
           }
       end
@@ -256,6 +256,18 @@ defmodule Transcoderr.Libraries do
 
       medium ->
         update_medium(medium, attrs)
+    end
+  end
+
+  def get_video_codec(path) do
+    case Transcoderr.MediaInfo.run(path) do
+      {:ok, info} ->
+        tracks = get_in(info, ["media", "track"])
+        first_video = Enum.find(tracks, fn track -> Map.get(track, "@type") == "Video" end)
+        Map.get(first_video, "CodecID")
+
+      _ ->
+        "unknown"
     end
   end
 
