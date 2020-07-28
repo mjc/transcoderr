@@ -17,13 +17,19 @@ defmodule Transcoderr.Application do
       TranscoderrWeb.Endpoint,
       # Start a worker by calling: Transcoderr.Worker.start_link(arg)
       # {Transcoderr.Worker, arg}
-      {DynamicSupervisor, name: Transcoderr.FilesystemSupervisor, strategy: :one_for_one}
+      {DynamicSupervisor, name: Transcoderr.FilesystemSupervisor, strategy: :one_for_one},
+      # this feels like a hack.
+      {Task, &start_watcher/0}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Transcoderr.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  def start_watcher() do
+    Transcoderr.Libraries.start_monitoring()
   end
 
   # Tell Phoenix to update the endpoint configuration
