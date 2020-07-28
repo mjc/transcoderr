@@ -141,6 +141,8 @@ defmodule Transcoderr.Libraries do
   """
   def get_medium!(id), do: Repo.get!(Medium, id)
 
+  def get_medium_by_path(path), do: Repo.get_by(Medium, path: path)
+
   @doc """
   Creates a medium.
 
@@ -191,6 +193,10 @@ defmodule Transcoderr.Libraries do
   """
   def delete_medium(%Medium{} = medium) do
     Repo.delete(medium)
+  end
+
+  def delete_media_by_path(path) do
+    Repo.delete_all(from m in Medium, where: m.path == ^path)
   end
 
   @doc """
