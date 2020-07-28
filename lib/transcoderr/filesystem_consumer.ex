@@ -43,12 +43,27 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   defp handle_fsevent(path, event) when event in [:created, :modified] do
-    case Transcoderr.Libraries.create_medium(medium_attrs(path)) do
+    medium = Transcoderr.Libraries.get_medium_by_path(path)
+
+    case Transcoderr.Libraries.get_medium_by_path(medium_attrs(path)) do
       {:ok, medium} ->
-        Logger.debug("Created medium", medium_id: medium.id)
+        Logger.debug("Created medium #{inspect(medium)}", medium_id: medium.id)
 
       {:error, medium} ->
-        Logger.error("Could not create medium for path #{path}", path: path, medium: medium)
+        Logger.debug("Could not create medium for path #{inspect(path)} (#{inspect(medium)})",
+          path: path,
+          medium: medium
+        )
+    end
+  end
+
+  defp handle_fsevent(path, event) when event in [:deleted] do
+    case Transcoderr.Libraries.delete_media_by_path(path) do
+      {count, _} when count > 0 ->
+        Logger.debug("Deleted media for #{inspect(path)}", path: path)
+
+      {0, _} ->
+        Logger.debug("Could not find any media to delete for #{inspect(path)}", path: path)
     end
   end
 
