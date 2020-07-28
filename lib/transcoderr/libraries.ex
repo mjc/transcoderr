@@ -211,4 +211,31 @@ defmodule Transcoderr.Libraries do
   def change_medium(%Medium{} = medium, attrs \\ %{}) do
     Medium.changeset(medium, attrs)
   end
+
+  def create_or_update_medium_by_path!(path) do
+    medium = get_medium_by_path(path)
+
+    attrs =
+      case get_library_by_path(path) do
+        nil ->
+          raise ArgumentError, "No library found for #{inspect(path)}"
+
+        library ->
+          %{
+            name: Path.basename(path),
+            path: path,
+            extension: Path.extname(path),
+            video_codec: "hardcoded",
+            library_id: Map.get(library, :id)
+          }
+      end
+
+    case medium do
+      nil ->
+        create_medium(attrs)
+
+      medium ->
+        update_medium(medium, attrs)
+    end
+  end
 end

@@ -46,25 +46,7 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   defp handle_fsevent(path, event) when event in [:created, :modified] do
-    medium = Libraries.get_medium_by_path(path)
-    attrs = medium_attrs(path)
-
-    case medium do
-      nil ->
-        case Libraries.create_medium(attrs) do
-          {:ok, medium} ->
-            Logger.debug("Created medium #{inspect(medium)}", medium_id: medium.id)
-
-          {:error, medium} ->
-            Logger.debug("Could not create medium for path #{inspect(path)} (#{inspect(medium)})",
-              path: path,
-              medium: medium
-            )
-        end
-
-      medium ->
-        Libraries.update_medium(medium, attrs)
-    end
+    Libraries.create_or_update_medium_by_path!(path)
   end
 
   defp handle_fsevent(path, event) when event in [:deleted] do
@@ -80,22 +62,6 @@ defmodule Transcoderr.FilesystemConsumer do
   defp handle_fsevent(path, event) do
     IO.inspect(path, label: "path")
     IO.inspect(event, label: "event")
-  end
-
-  defp medium_attrs(path) do
-    case Libraries.get_library_by_path(path) do
-      nil ->
-        raise ArgumentError, "No library found for #{inspect(path)}"
-
-      library ->
-        %{
-          name: Path.basename(path),
-          path: path,
-          extension: Path.extname(path),
-          video_codec: "hardcoded",
-          library_id: Map.get(library, :id)
-        }
-    end
   end
 
   @spec transform(any, any) :: Broadway.Message.t()
