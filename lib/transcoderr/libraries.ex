@@ -238,4 +238,18 @@ defmodule Transcoderr.Libraries do
         update_medium(medium, attrs)
     end
   end
+
+  def start_monitoring() do
+    dirs =
+      Repo.all(
+        from l in Library,
+          select: l.path
+      )
+
+    Transcoderr.FilesystemConsumer.start(dirs: dirs)
+  end
+
+  def stop_monitoring() do
+    Transcoderr.FilesystemConsumer.stop()
+  end
 end
