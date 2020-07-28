@@ -17,6 +17,7 @@ defmodule Transcoderr.Libraries.Library do
     |> cast(attrs, [:name, :path])
     |> validate_required([:name, :path])
     |> validate_path(:path)
+    |> unique_constraint([:path])
   end
 
   def validate_path(changeset, field, options \\ []) do

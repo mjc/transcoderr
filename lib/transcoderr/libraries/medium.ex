@@ -19,6 +19,6 @@ defmodule Transcoderr.Libraries.Medium do
     medium
     |> cast(attrs, [:name, :path, :extension, :video_codec, :library_id])
     |> validate_required([:name, :path, :extension, :video_codec, :library_id])
-    |> unique_constraint([:path, :library_id])
+    |> unique_constraint([:path])
   end
 end
