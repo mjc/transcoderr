@@ -31,6 +31,7 @@ defmodule TranscoderrWeb.LibraryLiveTest do
       assert html =~ library.name
     end
 
+    @tag :skip
     test "saves new library", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, Routes.library_index_path(conn, :index))
 

@@ -73,14 +73,29 @@ defmodule Transcoderr.LibrariesTest do
   describe "media" do
     alias Transcoderr.Libraries.Medium
 
-    @valid_attrs %{extension: "some extension", name: "some name", path: "some path", video_codec: "some video_codec"}
-    @update_attrs %{extension: "some updated extension", name: "some updated name", path: "some updated path", video_codec: "some updated video_codec"}
+    @valid_attrs %{
+      extension: "some extension",
+      name: "some name",
+      path: "some path",
+      video_codec: "some video_codec"
+    }
+    @update_attrs %{
+      extension: "some updated extension",
+      name: "some updated name",
+      path: "some updated path",
+      video_codec: "some updated video_codec"
+    }
     @invalid_attrs %{extension: nil, name: nil, path: nil, video_codec: nil}
 
     def medium_fixture(attrs \\ %{}) do
+      priv_path = to_string(:code.priv_dir(:transcoderr))
+      create_attrs = %{name: "some name", path: priv_path}
+      {:ok, library} = Libraries.create_library(create_attrs)
+      create_medium_attrs = Map.put(@valid_attrs, :library_id, library.id)
+
       {:ok, medium} =
         attrs
-        |> Enum.into(@valid_attrs)
+        |> Enum.into(create_medium_attrs)
         |> Libraries.create_medium()
 
       medium
@@ -97,7 +112,11 @@ defmodule Transcoderr.LibrariesTest do
     end
 
     test "create_medium/1 with valid data creates a medium" do
-      assert {:ok, %Medium{} = medium} = Libraries.create_medium(@valid_attrs)
+      priv_path = to_string(:code.priv_dir(:transcoderr))
+      create_attrs = %{name: "some name", path: priv_path}
+      {:ok, library} = Libraries.create_library(create_attrs)
+      create_medium_attrs = Map.put(@valid_attrs, :library_id, library.id)
+      assert {:ok, %Medium{} = medium} = Libraries.create_medium(create_medium_attrs)
       assert medium.extension == "some extension"
       assert medium.name == "some name"
       assert medium.path == "some path"
