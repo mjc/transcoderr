@@ -8,7 +8,7 @@ defmodule Transcoderr.FilesystemConsumer do
   alias Transcoderr.Libraries
 
   def start_link(opts) do
-    dirs = if opts[:dirs] == [], do: ["/nonexistent"], else: opts[:dir]
+    dirs = if opts[:dirs] == [], do: ["/nonexistent"], else: opts[:dirs]
 
     Broadway.start_link(__MODULE__,
       name: __MODULE__,

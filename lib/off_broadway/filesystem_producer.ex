@@ -9,6 +9,7 @@ defmodule OffBroadway.FilesystemProducer do
   def init(opts) do
     dirs = opts[:dirs] || [opts[:dir]]
     # @TODO: this needs to be made more robust
+    # @TODO: allow restarting the monitor for new paths
     name = __MODULE__.Watcher
 
     case FileSystem.start_link(dirs: dirs, name: name) do
@@ -33,14 +34,18 @@ defmodule OffBroadway.FilesystemProducer do
   end
 
   @impl true
+  @spec handle_info({:file_event, any, :stop | {any, any}}, %{watcher_pid: any}) ::
+          {:noreply, %{watcher_pid: any}} | {:noreply, [any], %{messages: any, watcher_pid: any}}
   def handle_info(
         {:file_event, watcher_pid, {path, events}},
         %{watcher_pid: watcher_pid, messages: current_messages} = state
       ) do
-    # YOUR OWN LOGIC FOR PATH AND EVENTS
-    [message | new_messages] = Enum.map(events, fn event -> {path, event} end)
-    messages = current_messages ++ new_messages
-    {:noreply, [message], %{state | messages: messages}}
+    with [message | new_messages] <- Enum.map(events, fn event -> {path, event} end) do
+      messages = current_messages ++ new_messages
+      {:noreply, [message], %{state | messages: messages}}
+    else
+      _ -> {:noreply, [], state}
+    end
   end
 
   def handle_info({:file_event, watcher_pid, :stop}, %{watcher_pid: watcher_pid} = state) do

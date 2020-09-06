@@ -280,8 +280,11 @@ defmodule Transcoderr.Libraries do
       )
 
     case Transcoderr.FilesystemConsumer.start(dirs: dirs) do
-      {:ok, _pid} -> :ok
-      _ -> :error
+      {:ok, _pid} ->
+        :ok
+
+      _ ->
+        :error
     end
   end
 
