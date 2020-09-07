@@ -1,41 +1,58 @@
-<h1>Listing Media</h1>
+<section class="section">
+  <div class="content is-small">
+    <h1>Listing Media</h1>
 
-<%= if @live_action in [:new, :edit] do %>
-  <%= live_modal @socket, TranscoderrWeb.MediumLive.FormComponent,
-    id: @medium.id || :new,
-    title: @page_title,
-    action: @live_action,
-    medium: @medium,
-    return_to: Routes.medium_index_path(@socket, :index) %>
-<% end %>
-
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Path</th>
-      <th>Extension</th>
-      <th>Video codec</th>
-
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="media">
-    <%= for medium <- @media do %>
-      <tr id="medium-<%= medium.id %>">
-        <td><%= medium.name %></td>
-        <td><%= medium.path %></td>
-        <td><%= medium.extension %></td>
-        <td><%= medium.video_codec %></td>
-
-        <td>
-          <span><%= live_redirect "Show", to: Routes.medium_show_path(@socket, :show, medium) %></span>
-          <span><%= live_patch "Edit", to: Routes.medium_index_path(@socket, :edit, medium) %></span>
-          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: medium.id, data: [confirm: "Are you sure?"] %></span>
-        </td>
-      </tr>
+    <%= if @live_action in [:new, :edit] do %>
+      <%= live_modal @socket, TranscoderrWeb.MediumLive.FormComponent,
+        id: @medium.id || :new,
+        title: @page_title,
+        action: @live_action,
+        medium: @medium,
+        save_button_target: "#medium-form",
+        return_to: Routes.medium_index_path(@socket, :index) %>
     <% end %>
-  </tbody>
-</table>
 
-<span><%= live_patch "New Medium", to: Routes.medium_index_path(@socket, :new) %></span>
+    <table class="table is-fullwidth is-hoverable is-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Path</th>
+          <th>Extension</th>
+          <th>Video codec</th>
+
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="media">
+        <%= for medium <- @media do %>
+          <tr id="medium-<%= medium.id %>">
+            <td><%= truncate_middle(medium.name) %></td>
+            <td><%= truncate_middle(medium.path) %></td>
+            <td><%= medium.extension %></td>
+            <td><%= medium.video_codec %></td>
+
+            <td >
+              <div class="buttons are-small has-addons is-centered">
+                <%= live_redirect to: Routes.medium_show_path(@socket, :show, medium) do %>
+                  <button class="button is-dark is-link">Show</button>
+                <% end %>
+                <%= live_patch to: Routes.medium_index_path(@socket, :edit, medium) do %>
+                <button class="button is-dark is-info">Edit</button>
+                <% end %>
+                <%= link to: "#", phx_click: "delete", phx_value_id: medium.id, data: [confirm: "Are you sure?"] do %>
+                <button class="button is-dark is-danger">Delete</button>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="buttons are-small has-addons">
+      <span>
+        <%= live_patch "New Medium", to: Routes.medium_index_path(@socket, :new), class: "button is-dark is-secondary" %>
+      </span>
+    </div>
+  </div>
+</section>

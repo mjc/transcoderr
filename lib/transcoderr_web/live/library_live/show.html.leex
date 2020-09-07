@@ -1,28 +1,31 @@
-<h1>Show Library</h1>
+<section class="section">
+  <div class="content is-small">
+    <h1>Show Library</h1>
+    <%= if @live_action in [:edit] do %>
+      <%= live_modal @socket, TranscoderrWeb.LibraryLive.FormComponent,
+        id: @library.id,
+        title: @page_title,
+        action: @live_action,
+        library: @library,
+        directories: ["/"],
+        save_button_target: "#library-form",
+        return_to: Routes.library_show_path(@socket, :show, @library) %>
+    <% end %>
+    <ul>
+      <li>
+        <strong>Name:</strong>
+        <%= @library.name %>
+      </li>
 
-<%= if @live_action in [:edit] do %>
-  <%= live_modal @socket, TranscoderrWeb.LibraryLive.FormComponent,
-    id: @library.id,
-    title: @page_title,
-    action: @live_action,
-    library: @library,
-    directories: ["/"],
-    return_to: Routes.library_show_path(@socket, :show, @library) %>
-<% end %>
+      <li>
+        <strong>Path:</strong>
+        <%= @library.path %>
+      </li>
+    </ul>
 
-<ul>
-
-  <li>
-    <strong>Name:</strong>
-    <%= @library.name %>
-  </li>
-
-  <li>
-    <strong>Path:</strong>
-    <%= @library.path %>
-  </li>
-
-</ul>
-
-<span><%= live_patch "Edit", to: Routes.library_show_path(@socket, :edit, @library), class: "button" %></span>
-<span><%= live_redirect "Back", to: Routes.library_index_path(@socket, :index) %></span>
+    <div class="buttons are-small has-addons">
+      <span><%= live_patch "Edit", to: Routes.library_show_path(@socket, :edit, @library), class: "button is-link is-dark" %></span>
+      <span><%= live_redirect "Back", to: Routes.library_index_path(@socket, :index), class: "button is-dark" %></span>
+    </div>
+  </div>
+</section>

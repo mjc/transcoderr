@@ -20,4 +20,17 @@ defmodule TranscoderrWeb.LiveHelpers do
     modal_opts = [id: :modal, return_to: path, component: component, opts: opts]
     live_component(socket, TranscoderrWeb.ModalComponent, modal_opts)
   end
+
+  def truncate_middle(path, max_length \\ 50) do
+    path_len = String.length(path)
+    if path_len > max_length do
+      half_max_length = div(max_length, 2)
+      path_split_at = div(path_len, 2) |> min(half_max_length)
+      {head, tail} = String.split_at(path, path_split_at - 3)
+      {_, tail} = String.split_at(tail, -path_split_at)
+      Enum.join([head, "...", tail], "")
+    else
+      path
+    end
+  end
 end

@@ -20,7 +20,12 @@ defmodule TranscoderrWeb.MediumLive.FormComponent do
       |> Libraries.change_medium(medium_params)
       |> Map.put(:action, :validate)
 
-    {:noreply, assign(socket, :changeset, changeset)}
+    {:noreply, assign(socket, :changeset, changeset) |> assign(:medium_params, medium_params)}
+  end
+
+  def handle_event("save", %{"value" => ""}, socket) do
+    medium_params = Map.get(socket.assigns, :medium_params) || %{}
+    save_medium(socket, socket.assigns.action, medium_params)
   end
 
   def handle_event("save", %{"medium" => medium_params}, socket) do
