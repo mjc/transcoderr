@@ -11,20 +11,93 @@
   </head>
   <body>
     <header>
-      <section class="container">
-        <nav role="navigation">
-          <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
-            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
-              <li><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
-            <% end %>
-          </ul>
-        </nav>
-        <a href="https://phoenixframework.org/" class="phx-logo">
-          <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
-        </a>
-      </section>
+      <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+        <div class="container">
+          <div class="navbar-brand">
+            <a class="navbar-item has-text-centered " href="<%= Routes.page_path(@conn, :index) %>">
+              <p class="title">Transcoderr</p>
+            </a>
+
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+            </a>
+          </div>
+          <div class="navbar-menu">
+            <div class="navbar-end">
+              <a href="<%= Routes.library_index_path(@conn, :index) %>" class="navbar-item is-active">
+                Libraries
+              </a>
+              <a href="<%= Routes.medium_index_path(@conn, :index) %>" class="navbar-item">
+                Media
+              </a>
+              <a class="navbar-item">
+                Search
+              </a>
+              <a class="navbar-item">
+                Logs
+              </a>
+              <a class="navbar-item">
+                Settings
+              </a>
+              <div class="navbar-item has-dropdown is-hoverable">
+                <div class="navbar-link">
+                  More
+                </div>
+                <div class="navbar-dropdown ">
+                  <a class="navbar-item " href="#">
+                    <div class="level is-mobile">
+                      <div class="level-left">
+                        <div class="level-item">
+                          <p>
+                            <strong>Documentation</strong>
+                            <br>
+                            <small>Full in-browser documentation</small>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                  <a class="navbar-item " href="#">
+                    <div class="level is-mobile">
+                      <div class="level-left">
+                        <div class="level-item">
+                          <p>
+                            <strong>Help</strong>
+                            <br>
+                            <small>Get help from the Transcoderr community</small>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
+              <span class="navbar-item">
+              <a class="button is-primary is-inverted">
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span>Source</span>
+              </a>
+            </span>
+            </div>
+          </div>
+        </div>
+      </nav>
     </header>
-    <%= @inner_content %>
+    <!-- Begin Content Root -->
+
+    <div class="columns is-multiline">
+      <div class="column is-2">
+        <%= if assigns[:content_menu] do %>
+          <%= render TranscoderrWeb.PageView, "content_menu.html", menu: assigns[:content_menu] %>
+        <% end %>
+      </div>
+      <div class="column is-10">
+        <%= @inner_content %>
+      </div>
+    </div>
   </body>
 </html>

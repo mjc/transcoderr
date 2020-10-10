@@ -10,7 +10,8 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:changeset, changeset)}
+     |> assign(:changeset, changeset)
+     |> assign(:perform_submit?, false)}
   end
 
   @impl true
@@ -27,7 +28,13 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
       socket
       |> assign(:changeset, changeset)
       |> assign(:directories, directories)
+      |> assign(:library_params, library_params)
     }
+  end
+
+  def handle_event("save", %{"value" => ""}, socket) do
+    library_params = Map.get(socket.assigns, :library_params) || %{}
+    save_library(socket, socket.assigns.action, library_params)
   end
 
   def handle_event("save", %{"library" => library_params}, socket) do

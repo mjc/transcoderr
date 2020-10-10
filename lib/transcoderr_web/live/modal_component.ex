@@ -4,16 +4,37 @@ defmodule TranscoderrWeb.ModalComponent do
   @impl true
   def render(assigns) do
     ~L"""
-    <div id="<%= @id %>" class="phx-modal"
+    <div id="<%= @id %>" class="modal is-active"
       phx-capture-click="close"
       phx-window-keydown="close"
       phx-key="escape"
       phx-target="#<%= @id %>"
       phx-page-loading>
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title"><%= @opts[:title] %></p>
 
-      <div class="phx-modal-content">
-        <%= live_patch raw("&times;"), to: @return_to, class: "phx-modal-close" %>
-        <%= live_component @socket, @component, @opts %>
+          <%= live_patch to: @return_to, class: "phx-modal-close" do %>
+            <button class="delete" aria-label="close"></button>
+          <% end %>
+        </header>
+        <section class="modal-card-body">
+          <%= live_component @socket, @component, @opts %>
+        </section>
+        <footer class="modal-card-foot">
+          <p class="control">
+            <%= if @opts[:save_button_target] do %>
+              <button phx-click="save" phx-target="<%= @opts[:save_button_target] %>" phx-disable-with="Saving..." class="button is-success">
+              Save
+              </button>
+            <% end %>
+
+            <%= live_patch to: @return_to, class: "phx-modal-close" do %>
+              <button class="button">Cancel</button>
+            <% end %>
+          </p>
+        </footer>
       </div>
     </div>
     """

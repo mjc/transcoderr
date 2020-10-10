@@ -1,0 +1,20 @@
+<section class="section">
+  <h1 class="title">Menu</h1>
+  <hr/>
+  <aside class="menu">
+    <%= for {_section, data} <- Enum.sort_by(@menu, &(elem(&1, 1).index)) do %>
+      <p class="menu-label">
+        <%= capitalize_text(data.label) %>
+      </p>
+      <%= if has_menu_items?(data) do %>
+      <ul class="menu-list">
+        <%= for {item_name, opts} <- data.items do %>
+        <li class="<%= is_active?(opts) %>">
+          <a><%= capitalize_text(item_name) %></a>
+        </li>
+        <% end %>
+      </ul>
+      <% end %>
+    <% end %>
+  </aside>
+</section>

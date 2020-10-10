@@ -1,38 +1,47 @@
-<h1>Listing Libraries</h1>
+<section class="section">
+  <div class="content is-small">
+  <h1 class="title">Listing Libraries</h1>
 
-<%= if @live_action in [:new, :edit] do %>
-  <%= live_modal @socket, TranscoderrWeb.LibraryLive.FormComponent,
-    id: @library.id || :new,
-    title: @page_title,
-    action: @live_action,
-    library: @library,
-    directories: ["/"],
-    return_to: Routes.library_index_path(@socket, :index) %>
-<% end %>
+  <%= if @live_action in [:new, :edit] do %>
+    <%= live_modal @socket, TranscoderrWeb.LibraryLive.FormComponent,
+      id: @library.id || :new,
+      title: @page_title,
+      action: @live_action,
+      library: @library,
+      directories: ["/"],
+      save_button_target: "#library-form",
+      return_to: Routes.library_index_path(@socket, :index) %>
+  <% end %>
 
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Path</th>
+  <table class="table is-fullwidth is-hoverable is-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Path</th>
 
-      <th></th>
-    </tr>
-  </thead>
-  <tbody id="libraries">
-    <%= for library <- @libraries do %>
-      <tr id="library-<%= library.id %>">
-        <td><%= library.name %></td>
-        <td><%= library.path %></td>
-
-        <td>
-          <span><%= live_redirect "Show", to: Routes.library_show_path(@socket, :show, library) %></span>
-          <span><%= live_patch "Edit", to: Routes.library_index_path(@socket, :edit, library) %></span>
-          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: library.id, data: [confirm: "Are you sure?"] %></span>
-        </td>
+        <th></th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody id="libraries">
+      <%= for library <- @libraries do %>
+        <tr id="library-<%= library.id %>">
+          <td><%= library.name %></td>
+          <td><%= library.path %></td>
 
-<span><%= live_patch "New Library", to: Routes.library_index_path(@socket, :new) %></span>
+          <td>
+            <div class="buttons are-small has-addons is-centered">
+              <%= live_redirect "Show", to: Routes.library_show_path(@socket, :show, library), class: "button is-dark is-link" %>
+              <%= live_patch "Edit", to: Routes.library_index_path(@socket, :edit, library), class: "button is-dark is-info" %>
+              <%= link "Delete", to: "#", phx_click: "delete", phx_value_id: library.id, data: [confirm: "Are you sure?"], class: "button is-dark is-danger" %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+    <div class="buttons are-small has-addons">
+      <span><%= live_patch "New Library", to: Routes.library_index_path(@socket, :new), class: "button is-link is-dark" %></span>
+    </div>
+  </div>
+</section>
