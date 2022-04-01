@@ -17,6 +17,20 @@ defmodule TranscoderrWeb.Router do
   scope "/", TranscoderrWeb do
     pipe_through :browser
 
+    live "/libraries", LibraryLive.Index, :index
+    live "/libraries/new", LibraryLive.Index, :new
+    live "/libraries/:id/edit", LibraryLive.Index, :edit
+
+    live "/libraries/:id", LibraryLive.Show, :show
+    live "/libraries/:id/show/edit", LibraryLive.Show, :edit
+
+    live "/media", MediumLive.Index, :index
+    live "/media/new", MediumLive.Index, :new
+    live "/media/:id/edit", MediumLive.Index, :edit
+
+    live "/media/:id", MediumLive.Show, :show
+    live "/media/:id/show/edit", MediumLive.Show, :edit
+
     get "/", PageController, :index
   end
 

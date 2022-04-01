@@ -7,11 +7,11 @@ defmodule Transcoderr.Repo.Migrations.CreateMedia do
       add :extension, :string
       add :path, :string
       add :video_codec, :string
-      add :library, references(:library, on_delete: :nothing)
+      add :library_id, references(:libraries, on_delete: :nothing)
 
       timestamps()
     end
 
-    create index(:media, [:library])
+    create index(:media, [:library_id])
   end
 end

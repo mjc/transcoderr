@@ -7,7 +7,7 @@ defmodule Transcoderr.Libraries.Medium do
     field :name, :string
     field :path, :string
     field :video_codec, :string
-    field :library, :id
+    field :library_id, :id
 
     timestamps()
   end

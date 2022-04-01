@@ -4,8 +4,18 @@ defmodule TranscoderrWeb.MediumLiveTest do
   import Phoenix.LiveViewTest
   import Transcoderr.LibrariesFixtures
 
-  @create_attrs %{extension: "some extension", name: "some name", path: "some path", video_codec: "some video_codec"}
-  @update_attrs %{extension: "some updated extension", name: "some updated name", path: "some updated path", video_codec: "some updated video_codec"}
+  @create_attrs %{
+    extension: "some extension",
+    name: "some name",
+    path: "some path",
+    video_codec: "some video_codec"
+  }
+  @update_attrs %{
+    extension: "some updated extension",
+    name: "some updated name",
+    path: "some updated path",
+    video_codec: "some updated video_codec"
+  }
   @invalid_attrs %{extension: nil, name: nil, path: nil, video_codec: nil}
 
   defp create_medium(_) do

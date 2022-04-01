@@ -77,7 +77,12 @@ defmodule Transcoderr.LibrariesTest do
     end
 
     test "create_medium/1 with valid data creates a medium" do
-      valid_attrs = %{extension: "some extension", name: "some name", path: "some path", video_codec: "some video_codec"}
+      valid_attrs = %{
+        extension: "some extension",
+        name: "some name",
+        path: "some path",
+        video_codec: "some video_codec"
+      }
 
       assert {:ok, %Medium{} = medium} = Libraries.create_medium(valid_attrs)
       assert medium.extension == "some extension"
@@ -92,7 +97,13 @@ defmodule Transcoderr.LibrariesTest do
 
     test "update_medium/2 with valid data updates the medium" do
       medium = medium_fixture()
-      update_attrs = %{extension: "some updated extension", name: "some updated name", path: "some updated path", video_codec: "some updated video_codec"}
+
+      update_attrs = %{
+        extension: "some updated extension",
+        name: "some updated name",
+        path: "some updated path",
+        video_codec: "some updated video_codec"
+      }
 
       assert {:ok, %Medium{} = medium} = Libraries.update_medium(medium, update_attrs)
       assert medium.extension == "some updated extension"
