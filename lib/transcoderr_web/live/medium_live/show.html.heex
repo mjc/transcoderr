@@ -1,0 +1,41 @@
+<h1>Show Medium</h1>
+
+<%= if @live_action in [:edit] do %>
+  <.modal return_to={Routes.medium_show_path(@socket, :show, @medium)}>
+    <.live_component
+      module={TranscoderrWeb.MediumLive.FormComponent}
+      id={@medium.id}
+      title={@page_title}
+      action={@live_action}
+      medium={@medium}
+      return_to={Routes.medium_show_path(@socket, :show, @medium)}
+    />
+  </.modal>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @medium.name %>
+  </li>
+
+  <li>
+    <strong>Extension:</strong>
+    <%= @medium.extension %>
+  </li>
+
+  <li>
+    <strong>Path:</strong>
+    <%= @medium.path %>
+  </li>
+
+  <li>
+    <strong>Video codec:</strong>
+    <%= @medium.video_codec %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.medium_show_path(@socket, :edit, @medium), class: "button" %></span> |
+<span><%= live_redirect "Back", to: Routes.medium_index_path(@socket, :index) %></span>

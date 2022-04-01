@@ -1,0 +1,45 @@
+<h1>Listing Media</h1>
+
+<%= if @live_action in [:new, :edit] do %>
+  <.modal return_to={Routes.medium_index_path(@socket, :index)}>
+    <.live_component
+      module={TranscoderrWeb.MediumLive.FormComponent}
+      id={@medium.id || :new}
+      title={@page_title}
+      action={@live_action}
+      medium={@medium}
+      return_to={Routes.medium_index_path(@socket, :index)}
+    />
+  </.modal>
+<% end %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Extension</th>
+      <th>Path</th>
+      <th>Video codec</th>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody id="media">
+    <%= for medium <- @media do %>
+      <tr id={"medium-#{medium.id}"}>
+        <td><%= medium.name %></td>
+        <td><%= medium.extension %></td>
+        <td><%= medium.path %></td>
+        <td><%= medium.video_codec %></td>
+
+        <td>
+          <span><%= live_redirect "Show", to: Routes.medium_show_path(@socket, :show, medium) %></span>
+          <span><%= live_patch "Edit", to: Routes.medium_index_path(@socket, :edit, medium) %></span>
+          <span><%= link "Delete", to: "#", phx_click: "delete", phx_value_id: medium.id, data: [confirm: "Are you sure?"] %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= live_patch "New Medium", to: Routes.medium_index_path(@socket, :new) %></span>

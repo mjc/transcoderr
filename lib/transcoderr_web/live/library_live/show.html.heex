@@ -1,0 +1,31 @@
+<h1>Show Library</h1>
+
+<%= if @live_action in [:edit] do %>
+  <.modal return_to={Routes.library_show_path(@socket, :show, @library)}>
+    <.live_component
+      module={TranscoderrWeb.LibraryLive.FormComponent}
+      id={@library.id}
+      title={@page_title}
+      action={@live_action}
+      library={@library}
+      return_to={Routes.library_show_path(@socket, :show, @library)}
+    />
+  </.modal>
+<% end %>
+
+<ul>
+
+  <li>
+    <strong>Name:</strong>
+    <%= @library.name %>
+  </li>
+
+  <li>
+    <strong>Path:</strong>
+    <%= @library.path %>
+  </li>
+
+</ul>
+
+<span><%= live_patch "Edit", to: Routes.library_show_path(@socket, :edit, @library), class: "button" %></span> |
+<span><%= live_redirect "Back", to: Routes.library_index_path(@socket, :index) %></span>
