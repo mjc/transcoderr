@@ -14,13 +14,15 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
   end
 
   @impl true
-  def handle_event("validate", %{"library" => library_params}, socket) do
+  def handle_event("validate", %{"library" => %{"path" => path} = library_params}, socket) do
     changeset =
       socket.assigns.library
       |> Libraries.change_library(library_params)
       |> Map.put(:action, :validate)
 
-    {:noreply, assign(socket, :changeset, changeset)}
+    directories = list_directories(path)
+
+    {:noreply, socket |> assign(:changeset, changeset) |> assign(:directories, directories)}
   end
 
   def handle_event("save", %{"library" => library_params}, socket) do
@@ -50,6 +52,18 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
+    end
+  end
+
+  defp list_directories(path) do
+    # @TODO review if this is safe to do with user input.
+    case File.ls(path) do
+      {:ok, entries} ->
+        Enum.map(entries, fn entry -> Path.join(path, entry) end)
+        |> Enum.take(25)
+
+      {:error, _} ->
+        []
     end
   end
 end

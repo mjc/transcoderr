@@ -37,6 +37,14 @@ defmodule Transcoderr.Libraries do
   """
   def get_library!(id), do: Repo.get!(Library, id)
 
+  @spec get_library_by_path(String.t()) :: Library.t()
+  def get_library_by_path(path) do
+    Enum.find(
+      Repo.all(Library),
+      fn library -> String.starts_with?(path, library.path) end
+    )
+  end
+
   @doc """
   Creates a library.
 
@@ -50,9 +58,19 @@ defmodule Transcoderr.Libraries do
 
   """
   def create_library(attrs \\ %{}) do
-    %Library{}
-    |> Library.changeset(attrs)
-    |> Repo.insert()
+    result =
+      %Library{}
+      |> Library.changeset(attrs)
+      |> Repo.insert()
+
+    case result do
+      {:ok, library} ->
+        restart_monitoring()
+        {:ok, library}
+
+      any ->
+        any
+    end
   end
 
   @doc """
@@ -68,9 +86,19 @@ defmodule Transcoderr.Libraries do
 
   """
   def update_library(%Library{} = library, attrs) do
-    library
-    |> Library.changeset(attrs)
-    |> Repo.update()
+    result =
+      library
+      |> Library.changeset(attrs)
+      |> Repo.update()
+
+    case result do
+      {:ok, library} ->
+        restart_monitoring()
+        {:ok, library}
+
+      any ->
+        any
+    end
   end
 
   @doc """
@@ -133,6 +161,8 @@ defmodule Transcoderr.Libraries do
   """
   def get_medium!(id), do: Repo.get!(Medium, id)
 
+  def get_medium_by_path(path), do: Repo.get_by(Medium, path: path)
+
   @doc """
   Creates a medium.
 
@@ -185,6 +215,10 @@ defmodule Transcoderr.Libraries do
     Repo.delete(medium)
   end
 
+  def delete_media_by_path(path) do
+    Repo.delete_all(from m in Medium, where: m.path == ^path)
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking medium changes.
 
@@ -196,5 +230,73 @@ defmodule Transcoderr.Libraries do
   """
   def change_medium(%Medium{} = medium, attrs \\ %{}) do
     Medium.changeset(medium, attrs)
+  end
+
+  def create_or_update_medium_by_path!(path) do
+    medium = get_medium_by_path(path)
+
+    attrs =
+      case get_library_by_path(path) do
+        nil ->
+          raise ArgumentError, "No library found for #{inspect(path)}"
+
+        library ->
+          %{
+            name: Path.basename(path),
+            path: path,
+            extension: Path.extname(path),
+            video_codec: get_video_codec(path),
+            library_id: Map.get(library, :id)
+          }
+      end
+
+    case medium do
+      nil ->
+        create_medium(attrs)
+
+      medium ->
+        update_medium(medium, attrs)
+    end
+  end
+
+  def get_video_codec(path) do
+    case Transcoderr.MediaInfo.run(path) do
+      {:ok, info} ->
+        tracks = get_in(info, ["media", "track"])
+        first_video = Enum.find(tracks, fn track -> Map.get(track, "@type") == "Video" end)
+        Map.get(first_video, "CodecID")
+
+      _ ->
+        "unknown"
+    end
+  end
+
+  @spec start_monitoring :: :error | :ok
+  def start_monitoring() do
+    dirs =
+      Repo.all(
+        from l in Library,
+          select: l.path
+      )
+
+    case Transcoderr.FilesystemConsumer.start(dirs: dirs) do
+      {:ok, _pid} ->
+        :ok
+
+      _ ->
+        :error
+    end
+  end
+
+  @spec stop_monitoring :: :ok | {:error, :not_found}
+  def stop_monitoring() do
+    Transcoderr.FilesystemConsumer.stop()
+  end
+
+  @spec restart_monitoring :: :error | :ok
+  def restart_monitoring() do
+    # @TODO this dumps the mailbox. it should not
+    stop_monitoring()
+    start_monitoring()
   end
 end

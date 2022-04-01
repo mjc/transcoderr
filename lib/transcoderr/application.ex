@@ -15,9 +15,10 @@ defmodule Transcoderr.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Transcoderr.PubSub},
       # Start the Endpoint (http/https)
-      TranscoderrWeb.Endpoint
+      TranscoderrWeb.Endpoint,
       # Start a worker by calling: Transcoderr.Worker.start_link(arg)
-      # {Transcoderr.Worker, arg}
+      # {Transcoderr.Worker, arg},
+      {DynamicSupervisor, name: Transcoderr.FilesystemSupervisor, strategy: :one_for_one}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

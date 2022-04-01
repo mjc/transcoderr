@@ -15,6 +15,11 @@
   
     <%= label f, :path %>
     <%= text_input f, :path %>
+    <datalist id="directories">
+      <%= for path <- @directories do %>
+        <option value={path} />
+      <% end %>
+    </datalist>
     <%= error_tag f, :path %>
   
     <div>
