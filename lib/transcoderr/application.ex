@@ -15,8 +15,6 @@ defmodule Transcoderr.Application do
       {Phoenix.PubSub, name: Transcoderr.PubSub},
       # Start the Endpoint (http/https)
       TranscoderrWeb.Endpoint,
-      # Start a worker by calling: Transcoderr.Worker.start_link(arg)
-      # {Transcoderr.Worker, arg}
       {DynamicSupervisor, name: Transcoderr.FilesystemSupervisor, strategy: :one_for_one},
       # this feels like a hack.
       {Task, &start_watcher/0}
