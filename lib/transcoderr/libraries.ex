@@ -38,12 +38,8 @@ defmodule Transcoderr.Libraries do
   def get_library!(id), do: Repo.get!(Library, id)
 
   @spec get_library_by_path(String.t()) :: Library.t()
-  def get_library_by_path(path) do
-    Enum.find(
-      Repo.all(Library),
-      fn library -> String.starts_with?(path, library.path) end
-    )
-  end
+  def get_library_by_path(path),
+    do: Repo.one(from l in Library, where: fragment("? LIKE CONCAT(path,'%')", ^path))
 
   @doc """
   Creates a library.
@@ -322,6 +318,9 @@ defmodule Transcoderr.Libraries do
 
   defp ls_r(path \\ ".") do
     cond do
+      String.starts_with?(Path.basename(path), ".") ->
+        []
+
       File.regular?(path) ->
         [path]
 
