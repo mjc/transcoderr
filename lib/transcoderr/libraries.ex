@@ -229,11 +229,12 @@ defmodule Transcoderr.Libraries do
     Medium.changeset(medium, attrs)
   end
 
-  def create_or_update_medium_by_path!(path) do
+  def create_or_update_medium_by_path!(path, library \\ nil) do
     medium = get_medium_by_path(path)
+    library = unless library, do: get_library_by_path(path), else: library
 
     attrs =
-      case get_library_by_path(path) do
+      case library do
         nil ->
           raise ArgumentError, "No library found for #{inspect(path)}"
 
@@ -298,22 +299,17 @@ defmodule Transcoderr.Libraries do
   end
 
   def scan_library(library) do
-    dirs =
-      Repo.all(
-        from l in Library,
-          select: l.path
-      )
+    dirs = Repo.all(Library)
 
-    files = Enum.flat_map(dirs, fn dir -> ls_r(dir) end)
+    Enum.each(dirs, fn %{path: dir} = library ->
+      files = ls_r(dir)
 
-    # Repo.transaction(fn ->
-    Enum.each(files, fn file ->
-      Repo.transaction(fn ->
-        create_or_update_medium_by_path!(file)
+      Enum.each(files, fn file ->
+        Repo.transaction(fn ->
+          create_or_update_medium_by_path!(file, library)
+        end)
       end)
     end)
-
-    # end)
   end
 
   defp ls_r(path \\ ".") do
