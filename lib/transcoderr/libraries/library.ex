@@ -7,6 +7,7 @@ defmodule Transcoderr.Libraries.Library do
   schema "libraries" do
     field :name, :string
     field :path, :string
+    has_many :media, Transcoderr.Libraries.Medium
 
     timestamps()
   end

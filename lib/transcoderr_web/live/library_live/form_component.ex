@@ -44,7 +44,11 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
 
   defp save_library(socket, :edit, library_params) do
     case Libraries.update_library(socket.assigns.library, library_params) do
-      {:ok, _library} ->
+      {:ok, library} ->
+        if Map.get(library_params, "scan_on_save") do
+          Libraries.scan_library(library)
+        end
+
         {:noreply,
          socket
          |> put_flash(:info, "Library updated successfully")
@@ -57,7 +61,11 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
 
   defp save_library(socket, :new, library_params) do
     case Libraries.create_library(library_params) do
-      {:ok, _library} ->
+      {:ok, library} ->
+        if Map.get(library_params, "scan_on_save") do
+          Libraries.scan_library(library)
+        end
+
         {:noreply,
          socket
          |> put_flash(:info, "Library created successfully")

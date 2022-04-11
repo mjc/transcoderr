@@ -17,6 +17,11 @@
         </datalist>
         <%= error_tag f, :path %>
       </div>
+
+      <div class="field">
+        <%= label f, :scan_on_save, class: "field-label" %>
+        <%= checkbox f, :scan_on_save, value: true %>
+      </div>
     </.form>
   </div>
 </section>

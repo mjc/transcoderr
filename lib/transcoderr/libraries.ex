@@ -178,6 +178,7 @@ defmodule Transcoderr.Libraries do
   def create_medium(attrs \\ %{}) do
     %Medium{}
     |> Medium.changeset(attrs)
+    |> Ecto.Changeset.put_assoc(:library, attrs.library)
     |> Repo.insert()
   end
 
@@ -246,7 +247,7 @@ defmodule Transcoderr.Libraries do
             path: path,
             extension: Path.extname(path),
             video_codec: get_video_codec(path),
-            library_id: Map.get(library, :id)
+            library: library
           }
       end
 
@@ -298,5 +299,40 @@ defmodule Transcoderr.Libraries do
     # @TODO this dumps the mailbox. it should not
     stop_monitoring()
     start_monitoring()
+  end
+
+  def scan_library(library) do
+    dirs =
+      Repo.all(
+        from l in Library,
+          select: l.path
+      )
+
+    files = Enum.flat_map(dirs, fn dir -> ls_r(dir) end)
+
+    # Repo.transaction(fn ->
+    Enum.each(files, fn file ->
+      Repo.transaction(fn ->
+        create_or_update_medium_by_path!(file)
+      end)
+    end)
+
+    # end)
+  end
+
+  defp ls_r(path \\ ".") do
+    cond do
+      File.regular?(path) ->
+        [path]
+
+      File.dir?(path) ->
+        File.ls!(path)
+        |> Enum.map(&Path.join(path, &1))
+        |> Enum.map(&ls_r/1)
+        |> Enum.concat()
+
+      true ->
+        []
+    end
   end
 end
