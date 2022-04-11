@@ -15,6 +15,7 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
   end
 
   @impl true
+
   def handle_event("validate", %{"library" => %{"path" => path} = library_params}, socket) do
     changeset =
       socket.assigns.library

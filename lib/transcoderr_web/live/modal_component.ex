@@ -3,12 +3,12 @@ defmodule TranscoderrWeb.ModalComponent do
 
   @impl true
   def render(assigns) do
-    ~L"""
-    <div id="<%= @id %>" class="modal is-active"
+    ~H"""
+    <div id="{@id}" class="modal is-active"
       phx-capture-click="close"
       phx-window-keydown="close"
       phx-key="escape"
-      phx-target="#<%= @id %>"
+      phx-target={"##{@id}"}
       phx-page-loading>
       <div class="modal-background"></div>
       <div class="modal-card">
@@ -25,7 +25,7 @@ defmodule TranscoderrWeb.ModalComponent do
         <footer class="modal-card-foot">
           <p class="control">
             <%= if @opts[:save_button_target] do %>
-              <button phx-click="save" phx-target="<%= @opts[:save_button_target] %>" phx-disable-with="Saving..." class="button is-success">
+              <button phx-click="save" phx-target={@opts[:save_button_target]} phx-disable-with="Saving..." class="button is-success">
               Save
               </button>
             <% end %>
