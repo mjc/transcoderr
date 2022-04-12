@@ -66,9 +66,11 @@ defmodule OffBroadway.FilesystemProducer do
   defp dispatch_events(queue, demand, events) do
     case :queue.out(queue) do
       {{:value, event}, queue} ->
+        # we got one event, recurse to get more unless demand is met
         dispatch_events(queue, demand - 1, [event | events])
 
       {:empty, queue} ->
+        # we ran out of events and there is still demand for more
         {Enum.reverse(events), queue, demand}
     end
   end
