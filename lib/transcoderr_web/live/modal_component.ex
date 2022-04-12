@@ -20,7 +20,7 @@ defmodule TranscoderrWeb.ModalComponent do
           <% end %>
         </header>
         <section class="modal-card-body">
-          <%= live_component @socket, @component, @opts %>
+          <%= live_component @component, @opts %>
         </section>
         <footer class="modal-card-foot">
           <p class="control">

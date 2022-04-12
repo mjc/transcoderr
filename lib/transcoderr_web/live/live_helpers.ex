@@ -15,14 +15,15 @@ defmodule TranscoderrWeb.LiveHelpers do
         library: @library,
         return_to: Routes.library_index_path(@socket, :index) %>
   """
-  def live_modal(socket, component, opts) do
+  def live_modal(component, opts) do
     path = Keyword.fetch!(opts, :return_to)
     modal_opts = [id: :modal, return_to: path, component: component, opts: opts]
-    live_component(socket, TranscoderrWeb.ModalComponent, modal_opts)
+    live_component(TranscoderrWeb.ModalComponent, modal_opts)
   end
 
   def truncate_middle(path, max_length \\ 50) do
     path_len = String.length(path)
+
     if path_len > max_length do
       half_max_length = div(max_length, 2)
       path_split_at = div(path_len, 2) |> min(half_max_length)

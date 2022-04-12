@@ -2,7 +2,7 @@
   <div class="content is-small">
     <h1>Show Library</h1>
     <%= if @live_action in [:edit] do %>
-      <%= live_modal @socket, TranscoderrWeb.LibraryLive.FormComponent,
+      <%= live_modal TranscoderrWeb.LibraryLive.FormComponent,
         id: @library.id,
         title: @page_title,
         action: @live_action,

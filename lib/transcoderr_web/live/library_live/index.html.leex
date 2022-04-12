@@ -3,7 +3,7 @@
   <h1 class="title">Listing Libraries</h1>
 
   <%= if @live_action in [:new, :edit] do %>
-    <%= live_modal @socket, TranscoderrWeb.LibraryLive.FormComponent,
+    <%= live_modal TranscoderrWeb.LibraryLive.FormComponent,
       id: @library.id || :new,
       title: @page_title,
       action: @live_action,

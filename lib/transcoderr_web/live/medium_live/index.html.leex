@@ -3,7 +3,7 @@
     <h1>Listing Media</h1>
 
     <%= if @live_action in [:new, :edit] do %>
-      <%= live_modal @socket, TranscoderrWeb.MediumLive.FormComponent,
+      <%= live_modal TranscoderrWeb.MediumLive.FormComponent,
         id: @medium.id || :new,
         title: @page_title,
         action: @live_action,
