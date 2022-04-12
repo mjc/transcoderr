@@ -63,7 +63,7 @@ defmodule Transcoderr.FilesystemConsumer do
     Process.send(producer, {:file_event, self(), {path, [:created]}}, [])
   end
 
-  defp handle_fsevent({path, event}) when event in [:created, :inodemetamod] do
+  defp handle_fsevent({path, event}) when event in [:created] do
     Libraries.create_or_update_medium_by_path!(path)
   end
 
@@ -78,7 +78,8 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   # @TODO we should debounce these during batching
-  defp handle_fsevent({_path, event}) when event in [:changeowner, :xattrmod], do: :skipped
+  defp handle_fsevent({_path, event}) when event in [:changeowner, :xattrmod, :modified],
+    do: :skipped
 
   defp handle_fsevent({path, event}) do
     IO.inspect(path, label: "path")
