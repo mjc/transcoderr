@@ -297,21 +297,25 @@ defmodule Transcoderr.Libraries do
     start_monitoring()
   end
 
-  def scan_library(library) do
-    dirs = Repo.all(Library)
+  def scan_libraries() do
+    libraries = Repo.all(Library)
 
-    Enum.each(dirs, fn %{path: dir} = library ->
-      files = ls_r(dir)
+    Enum.each(libraries, fn library ->
+      scan_library(library)
+    end)
+  end
 
-      Enum.each(files, fn file ->
-        Repo.transaction(fn ->
-          create_or_update_medium_by_path!(file, library)
-        end)
+  def scan_library(%Library{path: path} = library) do
+    files = ls_r(path)
+
+    Enum.each(files, fn file ->
+      Repo.transaction(fn ->
+        create_or_update_medium_by_path!(file, library)
       end)
     end)
   end
 
-  defp ls_r(path \\ ".") do
+  defp ls_r(path) do
     cond do
       String.starts_with?(Path.basename(path), ".") ->
         []
