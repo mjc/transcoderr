@@ -54,6 +54,7 @@ defmodule TranscoderrWeb.Router do
 
       live_dashboard "/dashboard",
         metrics: TranscoderrWeb.Telemetry,
+        ecto_psql_extras_options: [long_running_queries: [threshold: "200 milliseconds"]],
         additional_pages: [
           broadway: BroadwayDashboard
         ]
