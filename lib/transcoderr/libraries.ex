@@ -8,6 +8,8 @@ defmodule Transcoderr.Libraries do
 
   alias Transcoderr.Libraries.Library
 
+  require Logger
+
   @doc """
   Returns the list of libraries.
 
@@ -110,8 +112,11 @@ defmodule Transcoderr.Libraries do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_library(%Library{} = library) do
+  def delete_library(%Library{path: path} = library) do
     Repo.delete(library)
+    |> tap(fn {n, _result} when n > 0 ->
+      Transcoderr.Libraries.LiveUpdate.notify_live_view({__MODULE__, [:library, :removed], path})
+    end)
   end
 
   @doc """
@@ -239,7 +244,8 @@ defmodule Transcoderr.Libraries do
     attrs =
       case library do
         nil ->
-          raise ArgumentError, "No library found for #{inspect(path)}"
+          Logger.error("Library not found for medium: #{path}")
+          restart_monitoring()
 
         library ->
           %{

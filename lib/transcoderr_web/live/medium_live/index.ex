@@ -62,6 +62,18 @@ defmodule TranscoderrWeb.MediumLive.Index do
     {:noreply, assign(socket, :media, media)}
   end
 
+  def handle_info(
+        {_requesting_module, [:library, :removed], removed_path},
+        %{assigns: %{media: media}} = socket
+      ) do
+    media =
+      Enum.filter(media, fn %{path: path} ->
+        !String.starts_with?(path, removed_path)
+      end)
+
+    {:noreply, assign(socket, :media, media)}
+  end
+
   defp list_media do
     Libraries.list_media()
   end
