@@ -34,4 +34,8 @@ defmodule TranscoderrWeb.LiveHelpers do
       path
     end
   end
+
+  def active?(conn, path) do
+    if path == Phoenix.Controller.current_path(conn), do: "is-active", else: ""
+  end
 end

@@ -26,10 +26,10 @@
           </div>
           <div class="navbar-menu">
             <div class="navbar-end">
-              <a href={Routes.library_index_path(@conn, :index)} class="navbar-item is-active">
+              <a href={Routes.library_index_path(@conn, :index)} class={"navbar-item #{active?(@conn,Routes.library_index_path(@conn, :index))}"}>
                 Libraries
               </a>
-              <a href={Routes.medium_index_path(@conn, :index)} class="navbar-item">
+              <a href={Routes.medium_index_path(@conn, :index)} class={"navbar-item #{active?(@conn,Routes.medium_index_path(@conn, :index))}"}>
                 Media
               </a>
               <a class="navbar-item">
