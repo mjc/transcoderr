@@ -24,47 +24,52 @@ defmodule OffBroadway.FilesystemProducer do
         {:producer,
          %{
            watcher_pid: watcher_pid,
-           messages: []
+           messages: :queue.new(),
+           pending_demand: 0
          }}
     end
   end
 
   @impl true
-  def handle_demand(demand, %{messages: messages} = state) do
-    {taking, keeping} = Enum.split(messages, demand)
-    {:noreply, taking, %{state | messages: keeping}}
+  def handle_demand(incoming_demand, %{messages: queue, pending_demand: pending_demand} = state) do
+    {events, queue, demand} = dispatch_events(queue, incoming_demand + pending_demand, [])
+    {:noreply, events, %{state | messages: queue, pending_demand: demand}}
   end
 
   @impl true
-  @spec handle_info({:file_event, any, :stop | {any, any}}, %{watcher_pid: any}) ::
-          {:noreply, %{watcher_pid: any}} | {:noreply, [any], %{messages: any, watcher_pid: any}}
   def handle_info(
-        {:file_event, watcher_pid, {path, events}},
-        %{watcher_pid: watcher_pid, messages: current_messages} = state
+        {:file_event, _watcher_pid, {path, events}},
+        %{messages: queue, pending_demand: pending_demand} = state
       ) do
-    messages =
-      Enum.map(events, fn event ->
-        %Message{
-          data: {path, event},
-          acknowledger: {__MODULE__, :ack_id, :ack_data}
-        }
+    queue =
+      Enum.reduce(events, queue, fn event, acc ->
+        msg = %Message{data: {path, event}, acknowledger: {__MODULE__, :ack_id, :ack_data}}
+        :queue.in(msg, acc)
       end)
 
-    case messages do
-      [message | new_messages] ->
-        messages = current_messages ++ new_messages
-        {:noreply, [message], %{state | messages: messages}}
+    {events, queue, pending_demand} = dispatch_events(queue, pending_demand, [])
 
-      _ ->
-        {:noreply, [], state}
-    end
+    {:noreply, events, %{state | messages: queue, pending_demand: pending_demand}}
   end
 
   def handle_info({:file_event, watcher_pid, :stop}, %{watcher_pid: watcher_pid} = state) do
     {:noreply, state}
   end
 
+  # always just drop the event
   def ack(:ack_id, _successful, _failed) do
     :ok
+  end
+
+  defp dispatch_events(queue, 0, events), do: {Enum.reverse(events), queue, 0}
+
+  defp dispatch_events(queue, demand, events) do
+    case :queue.out(queue) do
+      {{:value, event}, queue} ->
+        dispatch_events(queue, demand - 1, [event | events])
+
+      {:empty, queue} ->
+        {Enum.reverse(events), queue, demand}
+    end
   end
 end

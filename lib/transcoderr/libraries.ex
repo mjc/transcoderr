@@ -270,7 +270,7 @@ defmodule Transcoderr.Libraries do
          codec when codec not in [:unknown] <- Map.get(first_video, "CodecID", :unknown) do
       codec
     else
-      any ->
+      _any ->
         "unknown"
     end
   end
