@@ -46,7 +46,7 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
     case Libraries.update_library(socket.assigns.library, library_params) do
       {:ok, library} ->
         if Map.get(library_params, "scan_on_save") == "true" do
-          Libraries.scan_library(library)
+          Task.async(fn -> Libraries.scan_library(library) end)
         end
 
         {:noreply,
@@ -63,7 +63,7 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
     case Libraries.create_library(library_params) do
       {:ok, library} ->
         if Map.get(library_params, "scan_on_save") == "true" do
-          Libraries.scan_library(library)
+          Task.async(fn -> Libraries.scan_library(library) end)
         end
 
         {:noreply,
