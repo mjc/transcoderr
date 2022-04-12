@@ -213,6 +213,9 @@ defmodule Transcoderr.Libraries do
 
   def delete_media_by_path(path) do
     Repo.delete_all(from m in Medium, where: m.path == ^path)
+    |> tap(fn result ->
+      Transcoderr.Libraries.LiveUpdate.notify_live_view({__MODULE__, [:media, :updated], result})
+    end)
   end
 
   @doc """
@@ -254,6 +257,10 @@ defmodule Transcoderr.Libraries do
       medium ->
         update_medium(medium, attrs)
     end
+    |> tap(fn result ->
+      # tap here is kinda gross
+      Transcoderr.Libraries.LiveUpdate.notify_live_view({__MODULE__, [:media, :updated], result})
+    end)
   end
 
   def get_video_codec(path) do

@@ -6,6 +6,8 @@ defmodule TranscoderrWeb.MediumLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    Libraries.LiveUpdate.subscribe_live_view()
+
     {:ok, assign(socket, :media, list_media())}
   end
 
@@ -36,6 +38,12 @@ defmodule TranscoderrWeb.MediumLive.Index do
   def handle_event("delete", %{"id" => id}, socket) do
     medium = Libraries.get_medium!(id)
     {:ok, _} = Libraries.delete_medium(medium)
+
+    {:noreply, assign(socket, :media, list_media())}
+  end
+
+  def handle_info({_requesting_module, [:media, :updated], value}, socket) do
+    IO.inspect(value)
 
     {:noreply, assign(socket, :media, list_media())}
   end
