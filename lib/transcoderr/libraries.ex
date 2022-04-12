@@ -213,7 +213,7 @@ defmodule Transcoderr.Libraries do
 
   def delete_media_by_path(path) do
     Repo.delete_all(from m in Medium, where: m.path == ^path)
-    |> tap(fn result ->
+    |> tap(fn {n, _result} when n > 0 ->
       Transcoderr.Libraries.LiveUpdate.notify_live_view({__MODULE__, [:media, :removed], path})
     end)
   end
@@ -257,9 +257,15 @@ defmodule Transcoderr.Libraries do
       medium ->
         update_medium(medium, attrs)
     end
-    |> tap(fn {:ok, medium} ->
-      # tap here is kinda gross
-      Transcoderr.Libraries.LiveUpdate.notify_live_view({__MODULE__, [:media, :updated], medium})
+    |> tap(fn
+      {:ok, medium} ->
+        # tap here is kinda gross
+        Transcoderr.Libraries.LiveUpdate.notify_live_view(
+          {__MODULE__, [:media, :updated], medium}
+        )
+
+      {:error, changeset} ->
+        {:error, changeset}
     end)
   end
 
@@ -312,15 +318,7 @@ defmodule Transcoderr.Libraries do
     end)
   end
 
-  def scan_library(%Library{path: path} = library) do
-    files = ls_r(path)
-
-    Enum.each(files, fn file ->
-      Repo.transaction(fn ->
-        create_or_update_medium_by_path!(file, library)
-      end)
-    end)
-  end
+  def scan_library(%Library{path: path}), do: ls_r(path)
 
   defp ls_r(path) do
     cond do
@@ -328,6 +326,7 @@ defmodule Transcoderr.Libraries do
         []
 
       File.regular?(path) ->
+        Transcoderr.FilesystemConsumer.scan_path(path)
         [path]
 
       File.dir?(path) ->
