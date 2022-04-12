@@ -35,8 +35,10 @@ defmodule Transcoderr.MixProject do
     [
       {:broadway, "~> 1.0.0"},
       {:broadway_dashboard, "~> 0.2.0"},
+      {:dart_sass, "~> 0.4", runtime: Mix.env() == :dev},
       {:ecto_psql_extras, "~> 0.7"},
       {:ecto_sql, "~> 3.7.0"},
+      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
       {:file_system, "~> 0.2"},
       {:floki, ">= 0.0.0", only: :test},
       {:gettext, "~> 0.19.0"},
@@ -62,9 +64,14 @@ defmodule Transcoderr.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup", "cmd npm install --prefix assets"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "assets.deploy": [
+        "esbuild default --minify",
+        "sass default --no-source-map --style=compressed",
+        "phx.digest"
+      ],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      setup: ["deps.get", "ecto.setup", "cmd npm install --prefix assets"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
   end
