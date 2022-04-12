@@ -1,6 +1,6 @@
 <section class="section">
   <div class="content is-medium">
-    <.form let={f} for={@changeset} id="library-form", class="form", phx_change="validate", phx_target={@myself}, phx_submit="save">
+    <.form let={f} for={@changeset} id="library-form" class="form" phx_change="validate" phx_target={@myself} phx_submit="save">
       <div class="field">
         <%= label f, :name, class: "field-label" %>
         <%= text_input f, :name, class: "input" %>
