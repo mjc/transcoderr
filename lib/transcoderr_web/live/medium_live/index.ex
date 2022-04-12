@@ -42,6 +42,7 @@ defmodule TranscoderrWeb.MediumLive.Index do
     {:noreply, assign(socket, :media, list_media())}
   end
 
+  @impl true
   def handle_info({_requesting_module, [:media, :updated], value}, socket) do
     {:noreply, assign(socket, :media, list_media())}
   end

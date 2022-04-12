@@ -14,7 +14,6 @@ defmodule Transcoderr.FilesystemConsumer do
       name: __MODULE__,
       producer: [
         module: {OffBroadway.FilesystemProducer, [dirs: dirs]},
-        transformer: {__MODULE__, :transform, []},
         rate_limiting: [
           allowed_messages: 60,
           interval: 10_000
@@ -50,13 +49,14 @@ defmodule Transcoderr.FilesystemConsumer do
 
   @impl true
   @spec handle_message(:default, Broadway.Message.t(), any) :: Broadway.Message.t()
-  def handle_message(:default, %Message{data: {path, event}} = message, _context) do
+  def handle_message(:default, message, _context) do
     message
     |> Message.put_batcher(:default)
   end
 
+  @impl true
   def handle_batch(:default, messages, _batch_info, _context) do
-    Enum.map(messages, fn %Message{data: {path, event}} = message ->
+    Enum.map(messages, fn message ->
       Message.update_data(message, &handle_fsevent/1)
     end)
   end
@@ -76,22 +76,10 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   # @TODO we should debounce these during batching
-  defp handle_fsevent(_path, event) when event in [:modified], do: :skipped
+  defp handle_fsevent({_path, event}) when event in [:modified], do: :skipped
 
   defp handle_fsevent({path, event}) do
     IO.inspect(path, label: "path")
     IO.inspect(event, label: "event")
-  end
-
-  @spec transform(any, any) :: Broadway.Message.t()
-  def transform(event, _opts) do
-    %Message{
-      data: event,
-      acknowledger: {__MODULE__, :ack_id, :ack_data}
-    }
-  end
-
-  def ack(:ack_id, _successful, _failed) do
-    :ok
   end
 end

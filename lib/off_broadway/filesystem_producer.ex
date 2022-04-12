@@ -1,6 +1,8 @@
 defmodule OffBroadway.FilesystemProducer do
   use GenStage
 
+  alias Broadway.Message
+
   def start_link(args) do
     GenStage.start_link(__MODULE__, args)
   end
@@ -40,15 +42,29 @@ defmodule OffBroadway.FilesystemProducer do
         {:file_event, watcher_pid, {path, events}},
         %{watcher_pid: watcher_pid, messages: current_messages} = state
       ) do
-    with [message | new_messages] <- Enum.map(events, fn event -> {path, event} end) do
-      messages = current_messages ++ new_messages
-      {:noreply, [message], %{state | messages: messages}}
-    else
-      _ -> {:noreply, [], state}
+    messages =
+      Enum.map(events, fn event ->
+        %Message{
+          data: {path, event},
+          acknowledger: {__MODULE__, :ack_id, :ack_data}
+        }
+      end)
+
+    case messages do
+      [message | new_messages] ->
+        messages = current_messages ++ new_messages
+        {:noreply, [message], %{state | messages: messages}}
+
+      _ ->
+        {:noreply, [], state}
     end
   end
 
   def handle_info({:file_event, watcher_pid, :stop}, %{watcher_pid: watcher_pid} = state) do
     {:noreply, state}
+  end
+
+  def ack(:ack_id, _successful, _failed) do
+    :ok
   end
 end
