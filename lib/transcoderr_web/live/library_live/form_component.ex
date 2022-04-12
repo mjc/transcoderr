@@ -45,7 +45,7 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
   defp save_library(socket, :edit, library_params) do
     case Libraries.update_library(socket.assigns.library, library_params) do
       {:ok, library} ->
-        if Map.get(library_params, "scan_on_save") do
+        if Map.get(library_params, "scan_on_save") == "true" do
           Libraries.scan_library(library)
         end
 
@@ -62,7 +62,7 @@ defmodule TranscoderrWeb.LibraryLive.FormComponent do
   defp save_library(socket, :new, library_params) do
     case Libraries.create_library(library_params) do
       {:ok, library} ->
-        if Map.get(library_params, "scan_on_save") do
+        if Map.get(library_params, "scan_on_save") == "true" do
           Libraries.scan_library(library)
         end
 
