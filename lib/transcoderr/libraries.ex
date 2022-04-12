@@ -90,6 +90,7 @@ defmodule Transcoderr.Libraries do
     case result do
       {:ok, library} ->
         restart_monitoring()
+
         {:ok, library}
 
       any ->
@@ -318,7 +319,10 @@ defmodule Transcoderr.Libraries do
     end)
   end
 
-  def scan_library(%Library{path: path}), do: ls_r(path)
+  def scan_library(%Library{path: path}) do
+    ls_r(path)
+    :ok
+  end
 
   defp ls_r(path) do
     cond do
