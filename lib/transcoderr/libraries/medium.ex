@@ -17,8 +17,8 @@ defmodule Transcoderr.Libraries.Medium do
   @doc false
   def changeset(medium, attrs) do
     medium
-    |> cast(attrs, [:name, :path, :extension, :video_codec])
-    |> validate_required([:name, :path, :extension, :video_codec])
+    |> cast(attrs, [:name, :path, :extension, :video_codec, :library_id])
+    |> validate_required([:name, :path, :extension, :video_codec, :library_id])
     |> unique_constraint([:path])
     |> foreign_key_constraint(:library)
   end

@@ -174,7 +174,6 @@ defmodule Transcoderr.Libraries do
   def create_medium(attrs \\ %{}) do
     %Medium{}
     |> Medium.changeset(attrs)
-    |> Ecto.Changeset.put_assoc(:library, attrs.library)
     |> Repo.insert()
   end
 
@@ -244,7 +243,7 @@ defmodule Transcoderr.Libraries do
             path: path,
             extension: Path.extname(path),
             video_codec: get_video_codec(path),
-            library: library
+            library_id: library.id
           }
       end
 
