@@ -7,6 +7,7 @@ defmodule Transcoderr.Libraries.Library do
   schema "libraries" do
     field :name, :string
     field :path, :string
+    field :scan_on_save, :boolean, virtual: true, default: false
     has_many :media, Transcoderr.Libraries.Medium
 
     timestamps()
@@ -15,7 +16,7 @@ defmodule Transcoderr.Libraries.Library do
   @doc false
   def changeset(library, attrs) do
     library
-    |> cast(attrs, [:name, :path])
+    |> cast(attrs, [:name, :path, :scan_on_save])
     |> validate_required([:name, :path])
     |> validate_path(:path)
     |> unique_constraint([:path])
