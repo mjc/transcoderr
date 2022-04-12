@@ -22,6 +22,9 @@ defmodule Transcoderr.FilesystemConsumer do
       ],
       processors: [
         default: [concurrency: 1]
+      ],
+      batchers: [
+        default: [concurrency: 1, batch_size: 10]
       ]
     )
   end
@@ -48,16 +51,21 @@ defmodule Transcoderr.FilesystemConsumer do
   @impl true
   @spec handle_message(:default, Broadway.Message.t(), any) :: Broadway.Message.t()
   def handle_message(:default, %Message{data: {path, event}} = message, _context) do
-    handle_fsevent(path, event)
-
     message
+    |> Message.put_batcher(:default)
   end
 
-  defp handle_fsevent(path, event) when event in [:created] do
+  def handle_batch(:default, messages, _batch_info, _context) do
+    Enum.map(messages, fn %Message{data: {path, event}} = message ->
+      Message.update_data(message, &handle_fsevent/1)
+    end)
+  end
+
+  defp handle_fsevent({path, event}) when event in [:created] do
     Libraries.create_or_update_medium_by_path!(path)
   end
 
-  defp handle_fsevent(path, event) when event in [:deleted] do
+  defp handle_fsevent({path, event}) when event in [:deleted] do
     case Libraries.delete_media_by_path(path) do
       {count, _} when count > 0 ->
         Logger.debug("Deleted media for #{inspect(path)}", path: path)
@@ -70,7 +78,7 @@ defmodule Transcoderr.FilesystemConsumer do
   # @TODO we should debounce these during batching
   defp handle_fsevent(_path, event) when event in [:modified], do: :skipped
 
-  defp handle_fsevent(path, event) do
+  defp handle_fsevent({path, event}) do
     IO.inspect(path, label: "path")
     IO.inspect(event, label: "event")
   end
