@@ -48,7 +48,7 @@ defmodule TranscoderrWeb.MediumLive.Index do
         %{assigns: %{media: media}} = socket
       ) do
     IO.inspect(medium, label: "media updated")
-    {:noreply, assign(socket, :media, media ++ [medium])}
+    {:noreply, assign(socket, :media, (media ++ [medium]) |> Enum.uniq())}
   end
 
   def handle_info(
