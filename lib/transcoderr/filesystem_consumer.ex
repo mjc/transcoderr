@@ -61,17 +61,17 @@ defmodule Transcoderr.FilesystemConsumer do
     end)
   end
 
-  defp handle_fsevent({path, event}) when event in [:created] do
+  defp handle_fsevent({path, event}) when event in [:created, :inodemetamod] do
     Libraries.create_or_update_medium_by_path!(path)
   end
 
-  defp handle_fsevent({path, event}) when event in [:deleted] do
+  defp handle_fsevent({path, event}) when event in [:removed] do
     case Libraries.delete_media_by_path(path) do
       {count, _} when count > 0 ->
-        Logger.debug("Deleted media for #{inspect(path)}", path: path)
+        Logger.info("Deleted media for #{inspect(path)}", path: path)
 
       {0, _} ->
-        Logger.debug("Could not find any media to delete for #{inspect(path)}", path: path)
+        Logger.info("Could not find any media to delete for #{inspect(path)}", path: path)
     end
   end
 

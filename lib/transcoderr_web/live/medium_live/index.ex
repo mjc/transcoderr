@@ -43,8 +43,6 @@ defmodule TranscoderrWeb.MediumLive.Index do
   end
 
   def handle_info({_requesting_module, [:media, :updated], value}, socket) do
-    IO.inspect(value)
-
     {:noreply, assign(socket, :media, list_media())}
   end
 

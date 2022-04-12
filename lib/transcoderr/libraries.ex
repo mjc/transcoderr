@@ -138,7 +138,7 @@ defmodule Transcoderr.Libraries do
 
   """
   def list_media do
-    Repo.all(Medium)
+    Repo.all(from m in Medium, order_by: [desc: m.inserted_at])
   end
 
   @doc """
@@ -264,13 +264,13 @@ defmodule Transcoderr.Libraries do
   end
 
   def get_video_codec(path) do
-    case Transcoderr.MediaInfo.run(path) do
-      {:ok, info} ->
-        tracks = get_in(info, ["media", "track"])
-        first_video = Enum.find(tracks, %{}, fn track -> Map.get(track, "@type") == "Video" end)
-        Map.get(first_video, "CodecID", :unknown)
-
-      _ ->
+    with {:ok, %{"media" => %{"track" => tracks}}} <- Transcoderr.MediaInfo.run(path),
+         first_video when not is_nil(first_video) and is_list(tracks) <-
+           Enum.find(tracks, %{}, fn track -> Map.get(track, "@type") == "Video" end),
+         codec when codec not in [:unknown] <- Map.get(first_video, "CodecID", :unknown) do
+      codec
+    else
+      any ->
         "unknown"
     end
   end
