@@ -9,7 +9,7 @@
       <%= if has_menu_items?(data) do %>
       <ul class="menu-list">
         <%= for {item_name, opts} <- data.items do %>
-        <li class="<%= is_active?(opts) %>">
+        <li class={is_active?(opts)}>
           <a><%= capitalize_text(item_name) %></a>
         </li>
         <% end %>

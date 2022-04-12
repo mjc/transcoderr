@@ -25,7 +25,7 @@
       </thead>
       <tbody id="media">
         <%= for medium <- @media do %>
-          <tr id="medium-<%= medium.id %>">
+          <tr id={"medium-#{medium.id}"}>
             <td><%= truncate_middle(medium.name) %></td>
             <td><%= truncate_middle(medium.path) %></td>
             <td><%= medium.extension %></td>

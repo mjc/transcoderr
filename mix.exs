@@ -37,6 +37,7 @@ defmodule Transcoderr.MixProject do
       {:broadway_dashboard, "~> 0.2.0"},
       {:ecto_psql_extras, "~> 0.7"},
       {:ecto_sql, "~> 3.7.0"},
+      {:file_system, "~> 0.2"},
       {:floki, ">= 0.0.0", only: :test},
       {:gettext, "~> 0.19.0"},
       {:jason, "~> 1.0"},

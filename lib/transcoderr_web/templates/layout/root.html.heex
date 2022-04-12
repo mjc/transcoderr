@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <%= csrf_meta_tag() %>
     <%= live_title_tag assigns[:page_title] || "Transcoderr", suffix: " · Phoenix Framework" %>
-    <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-    <script defer phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+    <link phx-track-static rel="stylesheet" href={Routes.static_path(@conn, "/css/app.css")} />
+    <script defer phx-track-static type="text/javascript" src={Routes.static_path(@conn, "/js/app.js")}></script>
   </head>
   <body>
     <header>
       <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
         <div class="container">
           <div class="navbar-brand">
-            <a class="navbar-item has-text-centered " href="<%= Routes.page_path(@conn, :index) %>">
+            <a class="navbar-item has-text-centered " href={Routes.page_path(@conn, :index)}>
               <p class="title">Transcoderr</p>
             </a>
 
@@ -26,10 +26,10 @@
           </div>
           <div class="navbar-menu">
             <div class="navbar-end">
-              <a href="<%= Routes.library_index_path(@conn, :index) %>" class="navbar-item is-active">
+              <a href={Routes.library_index_path(@conn, :index)} class="navbar-item is-active">
                 Libraries
               </a>
-              <a href="<%= Routes.medium_index_path(@conn, :index) %>" class="navbar-item">
+              <a href={Routes.medium_index_path(@conn, :index)} class="navbar-item">
                 Media
               </a>
               <a class="navbar-item">

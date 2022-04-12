@@ -24,7 +24,7 @@
     </thead>
     <tbody id="libraries">
       <%= for library <- @libraries do %>
-        <tr id="library-<%= library.id %>">
+        <tr id={"library-#{library.id}"}>
           <td><%= library.name %></td>
           <td><%= library.path %></td>
 
