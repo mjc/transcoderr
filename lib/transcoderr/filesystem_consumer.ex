@@ -57,6 +57,12 @@ defmodule Transcoderr.FilesystemConsumer do
     end)
   end
 
+  def scan_path(path) do
+    producer = Broadway.producer_names(__MODULE__) |> Enum.random()
+
+    Process.send(producer, {:file_event, self(), {path, [:created]}}, [])
+  end
+
   defp handle_fsevent({path, event}) when event in [:created, :inodemetamod] do
     Libraries.create_or_update_medium_by_path!(path)
   end
