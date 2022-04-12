@@ -20,7 +20,7 @@ defmodule Transcoderr.MixProject do
   def application do
     [
       mod: {Transcoderr.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :os_mon]
     ]
   end
 
@@ -34,6 +34,8 @@ defmodule Transcoderr.MixProject do
   defp deps do
     [
       {:broadway, "~> 1.0.0"},
+      {:broadway_dashboard, "~> 0.2.0"},
+      {:ecto_psql_extras, "~> 0.7"},
       {:ecto_sql, "~> 3.7.0"},
       {:floki, ">= 0.0.0", only: :test},
       {:gettext, "~> 0.19.0"},

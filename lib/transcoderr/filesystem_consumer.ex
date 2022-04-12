@@ -20,10 +20,10 @@ defmodule Transcoderr.FilesystemConsumer do
         ]
       ],
       processors: [
-        default: [concurrency: 1]
+        default: [concurrency: 4]
       ],
       batchers: [
-        default: [concurrency: 1, batch_size: 10]
+        default: [concurrency: 4, batch_size: 16]
       ]
     )
   end
