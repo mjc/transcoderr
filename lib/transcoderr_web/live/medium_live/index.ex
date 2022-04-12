@@ -43,8 +43,24 @@ defmodule TranscoderrWeb.MediumLive.Index do
   end
 
   @impl true
-  def handle_info({_requesting_module, [:media, :updated], value}, socket) do
-    {:noreply, assign(socket, :media, list_media())}
+  def handle_info(
+        {_requesting_module, [:media, :updated], medium},
+        %{assigns: %{media: media}} = socket
+      ) do
+    IO.inspect(medium, label: "media updated")
+    {:noreply, assign(socket, :media, media ++ [medium])}
+  end
+
+  def handle_info(
+        {_requesting_module, [:media, :removed], removed_path},
+        %{assigns: %{media: media}} = socket
+      ) do
+    media =
+      Enum.filter(media, fn %{path: path} ->
+        path != removed_path
+      end)
+
+    {:noreply, assign(socket, :media, media)}
   end
 
   defp list_media do

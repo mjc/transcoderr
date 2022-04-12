@@ -48,11 +48,7 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   @impl true
-  @spec handle_message(:default, Broadway.Message.t(), any) :: Broadway.Message.t()
-  def handle_message(:default, message, _context) do
-    message
-    |> Message.put_batcher(:default)
-  end
+  def handle_message(:default, message, _context), do: Message.put_batcher(message, :default)
 
   @impl true
   def handle_batch(:default, messages, _batch_info, _context) do
@@ -76,7 +72,7 @@ defmodule Transcoderr.FilesystemConsumer do
   end
 
   # @TODO we should debounce these during batching
-  defp handle_fsevent({_path, event}) when event in [:modified], do: :skipped
+  defp handle_fsevent({_path, event}) when event in [:changeowner, :xattrmod], do: :skipped
 
   defp handle_fsevent({path, event}) do
     IO.inspect(path, label: "path")
