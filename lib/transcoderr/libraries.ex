@@ -41,7 +41,7 @@ defmodule Transcoderr.Libraries do
 
   @spec get_library_by_path(String.t()) :: Library.t()
   def get_library_by_path(path),
-    do: Repo.one(from l in Library, where: fragment("? LIKE CONCAT(path,'%')", ^path))
+    do: Repo.one(from l in Library, where: fragment("starts_with(?, ?)", ^path, l.path))
 
   @doc """
   Creates a library.

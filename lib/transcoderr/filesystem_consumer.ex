@@ -10,14 +10,13 @@ defmodule Transcoderr.FilesystemConsumer do
   def start_link(opts) do
     dirs = if opts[:dirs] == [], do: ["/nonexistent"], else: opts[:dirs]
 
+    libraries = Libraries.list_libraries()
+
     Broadway.start_link(__MODULE__,
       name: __MODULE__,
+      context: [libraries: libraries],
       producer: [
-        module: {OffBroadway.FilesystemProducer, [dirs: dirs]},
-        rate_limiting: [
-          allowed_messages: 60,
-          interval: 10_000
-        ]
+        module: {OffBroadway.FilesystemProducer, [dirs: dirs]}
       ],
       processors: [
         default: [concurrency: 4]
@@ -51,9 +50,9 @@ defmodule Transcoderr.FilesystemConsumer do
   def handle_message(:default, message, _context), do: Message.put_batcher(message, :default)
 
   @impl true
-  def handle_batch(:default, messages, _batch_info, _context) do
+  def handle_batch(:default, messages, _batch_info, libraries: libraries) do
     Enum.map(messages, fn message ->
-      Message.update_data(message, &handle_fsevent/1)
+      Message.update_data(message, fn data -> handle_fsevent(data, libraries) end)
     end)
   end
 
@@ -63,11 +62,14 @@ defmodule Transcoderr.FilesystemConsumer do
     Process.send(producer, {:file_event, self(), {path, [:created]}}, [])
   end
 
-  defp handle_fsevent({path, event}) when event in [:created] do
-    Libraries.create_or_update_medium_by_path!(path)
+  defp handle_fsevent({path, event}, libraries) when event in [:created] do
+    Libraries.create_or_update_medium_by_path!(
+      path,
+      Enum.find(libraries, fn l -> String.starts_with?(path, l.path) end)
+    )
   end
 
-  defp handle_fsevent({path, event}) when event in [:removed] do
+  defp handle_fsevent({path, event}, _libraries) when event in [:removed, :deleted] do
     case Libraries.delete_media_by_path(path) do
       {count, _} when count > 0 ->
         Logger.info("Deleted media for #{inspect(path)}", path: path)
@@ -77,12 +79,11 @@ defmodule Transcoderr.FilesystemConsumer do
     end
   end
 
-  # @TODO we should debounce these during batching
-  defp handle_fsevent({_path, event}) when event in [:changeowner, :xattrmod, :modified],
-    do: :skipped
+  # @TODO we should debounce these long before we get here
+  defp handle_fsevent({_path, event}, _libraries)
+       when event in [:changeowner, :xattrmod, :modified, :closed],
+       do: :skipped
 
-  defp handle_fsevent({path, event}) do
-    IO.inspect(path, label: "path")
-    IO.inspect(event, label: "event")
-  end
+  defp handle_fsevent({path, event}, _libraries),
+    do: Logger.debug("Unhandled event #{inspect(event)} for #{inspect(path)}")
 end
