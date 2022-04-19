@@ -9,6 +9,7 @@ defmodule Transcoderr.Libraries.Medium do
     field :name, :string
     field :path, :string
     field :video_codec, :string
+    field :conversions, :map
     belongs_to(:library, Transcoderr.Libraries.Library, type: :binary_id)
 
     timestamps()
@@ -17,7 +18,7 @@ defmodule Transcoderr.Libraries.Medium do
   @doc false
   def changeset(medium, attrs) do
     medium
-    |> cast(attrs, [:name, :path, :extension, :video_codec, :library_id])
+    |> cast(attrs, [:name, :path, :extension, :video_codec, :library_id, :conversions])
     |> validate_exclusion(:video_codec, ["unknown"])
     |> validate_required([:name, :path, :extension, :video_codec, :library_id])
     |> unique_constraint([:path])
